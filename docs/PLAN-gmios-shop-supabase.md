@@ -1,6 +1,6 @@
-# Project Plan: Shop bán Account Game (Angular + Supabase + PayOS + Resend)
+# Project Plan: Shop bán Account Game (Angular + Supabase + SePay + Resend)
 
-Dự án phát triển cửa hàng bán tài khoản game trực tuyến (LOL, FC Online, Liên Quân Mobile...) sử dụng Angular 21 Standalone cho Frontend, Supabase làm Backend-as-a-Service (BaaS), tích hợp cổng thanh toán tự động PayOS và hệ thống gửi email tự động qua Resend. Quản lý trạng thái ứng dụng sử dụng Angular Signals.
+Dự án phát triển cửa hàng bán tài khoản game trực tuyến (LOL, FC Online, Liên Quân Mobile...) sử dụng Angular 21 Standalone cho Frontend, Supabase làm Backend-as-a-Service (BaaS), tích hợp giải pháp tự động hóa ngân hàng qua SePay và hệ thống gửi email tự động qua Resend. Quản lý trạng thái ứng dụng sử dụng Angular Signals.
 
 ## 📋 Project Type
 - **Project Type**: WEB (Angular Standalone, Supabase BaaS)
@@ -12,9 +12,9 @@ Dự án phát triển cửa hàng bán tài khoản game trực tuyến (LOL, F
 - [ ] Khách hàng xem được danh sách tài khoản theo từng game.
 - [ ] Bộ lọc hoạt động tốt: lọc theo tựa game, khoảng giá, sắp xếp giá cao-thấp.
 - [ ] **Ràng buộc đăng nhập**: Khách hàng bắt buộc phải đăng ký/đăng nhập tài khoản trước mới có thể mua hàng.
-- [ ] Khi click mua và đã đăng nhập, gọi Supabase Edge Function tạo link thanh toán PayOS thành công.
-- [ ] Tích hợp thanh toán PayOS thông qua popup/mở tab checkout của PayOS.
-- [ ] Supabase Edge Function nhận webhook từ PayOS, xác thực chữ ký bảo mật (checksum) và cập nhật trạng thái đơn hàng + tài khoản tự động.
+- [ ] Khi click mua và đã đăng nhập, tạo đơn hàng trong database và hiển thị modal checkout chứa mã QR chuyển khoản VietQR tự động.
+- [ ] Tích hợp thanh toán SePay bằng cách hiển thị mã QR VietQR (chứa số tài khoản, số tiền và nội dung chuyển khoản có dạng `GMS[payment_code]`).
+- [ ] Supabase Edge Function `sepay-webhook` nhận webhook từ SePay, xác thực API Key từ Authorization header (`Apikey <token>`), khớp nội dung chuyển khoản và cập nhật trạng thái đơn hàng + tài khoản tự động.
 - [ ] **Gửi Email tự động (Resend)**: Sau khi thanh toán thành công, hệ thống tự động gửi thông tin đăng nhập tài khoản game (username, password) về email của khách hàng.
 - [ ] Khách hàng nhận được tài khoản ngay trên màn hình Checkout qua Supabase Realtime khi giao dịch hoàn tất.
 
@@ -24,7 +24,7 @@ Dự án phát triển cửa hàng bán tài khoản game trực tuyến (LOL, F
 - **Frontend**: Angular 21, Angular Signals, RxJS (để polling/realtime), Vanilla CSS/SCSS (Dark Mode).
 - **Backend**: Supabase Database, Supabase Realtime, Supabase Edge Functions (Deno/TypeScript).
 - **Authentication**: Supabase Auth (Email & Password login/register).
-- **Payment**: PayOS API & Webhook (sử dụng thư viện HmacSHA256 để xác thực signature).
+- **Payment**: SePay Webhook (tự động hóa ngân hàng, xác thực API Key bằng Authorization header).
 - **Email Service**: Resend API (Gửi email giao dịch tự động từ backend Edge Function).
 
 ---
@@ -35,10 +35,8 @@ supabase/
 ├── migrations/
 │   └── 20260522000000_init_schema.sql  # Database tables & RLS (includes auth.users relationship)
 └── functions/
-    ├── payos-create-link/
-    │   └── index.ts                     # API tạo link thanh toán PayOS
-    └── payos-webhook/
-        └── index.ts                     # Webhook nhận callback từ PayOS & gửi email qua Resend
+    └── sepay-webhook/
+        └── index.ts                     # Webhook nhận callback từ SePay, xác thực API Key & cập nhật DB + gửi email qua Resend
 src/
 └── app/
     ├── core/
@@ -87,22 +85,18 @@ src/
     - Người dùng chỉ có thể xem các đơn hàng (`orders`) do chính mình thực hiện.
   - **Verify**: Kiểm tra thử bảo mật bằng truy vấn ẩn danh và truy vấn có đăng nhập.
 
-### Phase 2: PayOS & Resend Edge Functions (P1 - Core Backend)
-- [ ] **Task 3**: Cấu hình các biến môi trường cho Supabase Edge Functions (`PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY`, `RESEND_API_KEY`).
+### Phase 2: SePay & Resend Edge Functions (P1 - Core Backend)
+- [ ] **Task 3**: Cấu hình các biến môi trường cho Supabase Edge Functions (`SEPAY_API_KEY`, `RESEND_API_KEY`).
   - **Agent**: `devops-engineer`
-  - **Input**: Thông tin API Key từ dashboard PayOS và Resend.
-  - **Output**: Các biến môi trường được cấu hình trên Supabase CLI/Dashboard
-  - **Verify**: Chạy thử câu lệnh kiểm tra biến môi trường thành công.
-- [ ] **Task 4**: Triển khai Edge Function `payos-create-link` để tạo link thanh toán.
+  - **Input**: API Key của SePay (làm token đối soát webhook) và API Key của Resend.
+  - **Output**: Các biến môi trường được cấu hình trên Supabase CLI/Dashboard.
+  - **Verify**: Chạy lệnh kiểm tra cấu hình biến môi trường trên dashboard Supabase thành công.
+- [ ] **Task 4**: [DELETE] Không cần Edge Function tạo link thanh toán (QR Code được sinh trực tiếp ở Client-side thông qua VietQR API).
+- [ ] **Task 5**: Triển khai Edge Function `sepay-webhook` nhận kết quả giao dịch từ SePay và tích hợp gửi Email qua Resend.
   - **Agent**: `backend-specialist`
-  - **Input**: PayOS API schema tạo link thanh toán (gồm orderCode, amount, description, cancelUrl, returnUrl, signature).
-  - **Output**: File `supabase/functions/payos-create-link/index.ts`
-  - **Verify**: Gửi thử request POST từ Postman kèm JWT token đăng nhập và thông tin account cần mua -> Nhận được URL thanh toán từ PayOS.
-- [ ] **Task 5**: Triển khai Edge Function `payos-webhook` nhận kết quả giao dịch và tích hợp gửi Email qua Resend.
-  - **Agent**: `backend-specialist`
-  - **Input**: Cấu trúc webhook payload của PayOS, thuật toán SHA256 đối soát chữ ký, API gửi mail của Resend.
-  - **Output**: File `supabase/functions/payos-webhook/index.ts`
-  - **Verify**: Giả lập webhook gọi từ PayOS -> Database cập nhật đơn hàng thành `'paid'`, tài khoản thành `'sold'`, đồng thời kích hoạt gửi email chứa thông tin account game (username/password) thành công qua Resend đến khách hàng.
+  - **Input**: Webhook payload từ SePay (chứa `amount_in`, `transaction_content` khớp với `payment_code`), header `Authorization: Apikey <token>` và API gửi mail của Resend.
+  - **Output**: File `supabase/functions/sepay-webhook/index.ts`
+  - **Verify**: Giả lập webhook gọi từ SePay kèm header `Authorization: Apikey <SEPAY_API_KEY>` -> Database cập nhật trạng thái đơn hàng thành `'paid'`, tài khoản thành `'sold'`, và kích hoạt gửi email chứa tài khoản game (username/password) qua Resend thành công.
 
 ### Phase 3: Angular Infrastructure & Auth (P2 - Core Frontend)
 - [ ] **Task 6**: Cài đặt Supabase JS SDK, viết `SupabaseService`, `AuthService`, `AccountService` và `OrderService` sử dụng Signals.
@@ -122,11 +116,11 @@ src/
   - **Input**: Layout mockups, bộ lọc
   - **Output**: Các component Angular Standalone cùng style SCSS tối ưu cho việc hiển thị tài khoản game.
   - **Verify**: Hiển thị danh sách, chạy thử bộ lọc giá và bộ lọc game hoạt động mượt mà.
-- [ ] **Task 8**: Triển khai `CheckoutModalComponent` tích hợp thanh toán PayOS và lắng nghe sự thay đổi trạng thái đơn hàng theo thời gian thực (Supabase Realtime).
+- [ ] **Task 8**: Triển khai `CheckoutModalComponent` hiển thị thông tin chuyển khoản VietQR và lắng nghe sự thay đổi trạng thái đơn hàng theo thời gian thực (Supabase Realtime).
   - **Agent**: `frontend-specialist`
-  - **Input**: URL thanh toán trả về từ PayOS, kết nối Realtime, trạng thái Auth.
-  - **Output**: Component Checkout hoàn thiện. Kiểm tra nếu người dùng chưa đăng nhập, bắt buộc hiển thị màn hình Auth trước.
-  - **Verify**: Tiến hành thanh toán giả lập -> Webhook nhận được -> UI cập nhật hiển thị thông tin tài khoản tự động mà không cần reload trang.
+  - **Input**: Mã `payment_code` và số tiền từ đơn hàng vừa tạo, kết nối Realtime, trạng thái Auth.
+  - **Output**: Component Checkout hoàn thiện hiển thị mã QR VietQR động (`https://img.vietqr.io/image/...`). Lắng nghe trạng thái đơn hàng chuyển sang `paid` qua Realtime.
+  - **Verify**: Người dùng tạo đơn hàng -> hiển thị đúng QR với nội dung chuyển khoản tương ứng -> chuyển khoản thành công -> UI tự động cập nhật hiển thị thông tin đăng nhập của tài khoản game vừa mua trên màn hình Checkout mà không cần tải lại trang.
 
 ---
 
