@@ -43,5 +43,15 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
-#agent file
+# agent file
 .agent/*
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+supabase/functions/.env
+supabase/functions/.env.local
+
+docs/*

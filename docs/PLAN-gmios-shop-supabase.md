@@ -3,12 +3,14 @@
 Dự án phát triển cửa hàng bán tài khoản game trực tuyến (LOL, FC Online, Liên Quân Mobile...) sử dụng Angular 21 Standalone cho Frontend, Supabase làm Backend-as-a-Service (BaaS), tích hợp giải pháp tự động hóa ngân hàng qua SePay và hệ thống gửi email tự động qua Resend. Quản lý trạng thái ứng dụng sử dụng Angular Signals.
 
 ## 📋 Project Type
+
 - **Project Type**: WEB (Angular Standalone, Supabase BaaS)
 - **Primary Agent**: `frontend-specialist` (for UI/UX and client components), `backend-specialist` (for Supabase Edge Function & DB schema)
 
 ---
 
 ## 🎯 Success Criteria
+
 - [ ] Khách hàng xem được danh sách tài khoản theo từng game.
 - [ ] Bộ lọc hoạt động tốt: lọc theo tựa game, khoảng giá, sắp xếp giá cao-thấp.
 - [ ] **Ràng buộc đăng nhập**: Khách hàng bắt buộc phải đăng ký/đăng nhập tài khoản trước mới có thể mua hàng.
@@ -21,6 +23,7 @@ Dự án phát triển cửa hàng bán tài khoản game trực tuyến (LOL, F
 ---
 
 ## 🛠️ Tech Stack
+
 - **Frontend**: Angular 21, Angular Signals, RxJS (để polling/realtime), Vanilla CSS/SCSS (Dark Mode).
 - **Backend**: Supabase Database, Supabase Realtime, Supabase Edge Functions (Deno/TypeScript).
 - **Authentication**: Supabase Auth (Email & Password login/register).
@@ -30,6 +33,7 @@ Dự án phát triển cửa hàng bán tài khoản game trực tuyến (LOL, F
 ---
 
 ## 📂 Proposed File Structure
+
 ```plaintext
 supabase/
 ├── migrations/
@@ -71,12 +75,13 @@ src/
 ## 📝 Task Breakdown
 
 ### Phase 1: Database Setup & RLS (P0 - Foundation)
+
 - [x] **Task 1**: Thiết kế file SQL khởi tạo `supabase/migrations/20260522000000_init_schema.sql` gồm các bảng `games`, `accounts` (có thông tin nhạy cảm), và `orders` liên kết với `auth.users(id)`.
   - **Agent**: `database-architect`
   - **Input**: Schema thiết kế
   - **Output**: File SQL khởi tạo
   - **Verify**: Chạy SQL file thành công trong SQL Editor của Supabase.
-- [ ] **Task 2**: Cấu hình Row Level Security (RLS) cho các bảng.
+- [x] **Task 2**: Cấu hình Row Level Security (RLS) cho các bảng.
   - **Agent**: `security-auditor`
   - **Input**: Bảng database đã khởi tạo
   - **Output**: RLS Policies cho phép:
@@ -86,7 +91,8 @@ src/
   - **Verify**: Kiểm tra thử bảo mật bằng truy vấn ẩn danh và truy vấn có đăng nhập.
 
 ### Phase 2: SePay & Resend Edge Functions (P1 - Core Backend)
-- [ ] **Task 3**: Cấu hình các biến môi trường cho Supabase Edge Functions (`SEPAY_API_KEY`, `RESEND_API_KEY`).
+
+- [x] **Task 3**: Cấu hình các biến môi trường cho Supabase Edge Functions (`SEPAY_API_KEY`, `RESEND_API_KEY`).
   - **Agent**: `devops-engineer`
   - **Input**: API Key của SePay (làm token đối soát webhook) và API Key của Resend.
   - **Output**: Các biến môi trường được cấu hình trên Supabase CLI/Dashboard.
@@ -99,6 +105,7 @@ src/
   - **Verify**: Giả lập webhook gọi từ SePay kèm header `Authorization: Apikey <SEPAY_API_KEY>` -> Database cập nhật trạng thái đơn hàng thành `'paid'`, tài khoản thành `'sold'`, và kích hoạt gửi email chứa tài khoản game (username/password) qua Resend thành công.
 
 ### Phase 3: Angular Infrastructure & Auth (P2 - Core Frontend)
+
 - [ ] **Task 6**: Cài đặt Supabase JS SDK, viết `SupabaseService`, `AuthService`, `AccountService` và `OrderService` sử dụng Signals.
   - **Agent**: `frontend-specialist`
   - **Input**: Supabase API credentials
@@ -111,6 +118,7 @@ src/
   - **Verify**: Đăng ký và đăng nhập được tài khoản vào hệ thống thông qua Supabase Auth.
 
 ### Phase 4: UI/UX & Realtime Integration (P2 - UI/UX)
+
 - [ ] **Task 7**: Triển khai các component: `HomeComponent`, `AccountListComponent`, `AccountDetailComponent`.
   - **Agent**: `frontend-specialist`
   - **Input**: Layout mockups, bộ lọc
@@ -125,6 +133,7 @@ src/
 ---
 
 ## 🏁 Phase X: Verification
+
 - [ ] No purple/violet color hex codes in CSS (`GEMINI.md` Design guidelines).
 - [ ] No standard generic template layouts.
 - [ ] Run checklist verification: `python .agent/scripts/checklist.py .`
