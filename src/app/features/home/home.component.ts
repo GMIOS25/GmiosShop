@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { AccountService } from '../../core/services/account.service';
 
 @Component({
   selector: 'app-home',
@@ -9,12 +10,20 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   readonly authService = inject(AuthService);
+  readonly accountService = inject(AccountService);
 
-  readonly gamesList = [
-    { name: 'League of Legends', slug: 'lol', count: '124 tài khoản', icon: '🏆' },
-    { name: 'FC Online', slug: 'fco', count: '89 tài khoản', icon: '⚽' },
-    { name: 'Arena of Valor', slug: 'aov', count: '145 tài khoản', icon: '⚔️' }
-  ];
+  ngOnInit(): void {
+    this.accountService.loadGames();
+  }
+
+  getGameIcon(slug: string): string {
+    switch (slug) {
+      case 'lol': return '/assets/icons/lol.png';
+      case 'fco': return '/assets/icons/fco.png';
+      case 'lqm': return '/assets/icons/lqm.png';
+      default: return '🎮';
+    }
+  }
 }

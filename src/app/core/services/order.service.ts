@@ -177,6 +177,29 @@ export class OrderService implements OnDestroy {
     }
   }
 
+  async expireOrder(orderId: string): Promise<boolean> {
+    try {
+      const { error } = await this.supabaseService.client
+        .from('orders')
+        .update({ payment_status: 'expired' })
+        .eq('id', orderId)
+        .eq('payment_status', 'pending');
+
+      if (error) throw error;
+
+      const active = this.#activeOrder();
+      if (active && active.id === orderId) {
+        this.clearActiveOrder();
+      }
+
+      await this.loadUserOrders();
+      return true;
+    } catch (err) {
+      console.error('Error expiring order:', err);
+      return false;
+    }
+  }
+
   clearActiveOrder(): void {
     this.unsubscribeFromRealtime();
     this.#activeOrder.set(null);

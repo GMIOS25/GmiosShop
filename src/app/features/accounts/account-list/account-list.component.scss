@@ -1,0 +1,518 @@
+$color-bg-card: #121214;
+$color-border: #26262b;
+$color-border-hover: #ffffff;
+$color-text-primary: #ffffff;
+$color-text-secondary: #8e8e93;
+$color-text-muted: #55555a;
+$color-action-bg: #ffffff;
+$color-action-text: #000000;
+$color-success: #30d158;
+$color-warning: #ff9f0a;
+$border-radius-premium: 12px;
+
+.account-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Breadcrumbs with subtle dividers */
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: $color-text-secondary;
+  margin-bottom: 0.5rem;
+
+  .breadcrumb-link {
+    text-decoration: none;
+    color: $color-text-secondary;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-text-primary;
+    }
+  }
+
+  .breadcrumb-separator {
+    color: $color-text-muted;
+  }
+
+  .breadcrumb-active {
+    color: $color-text-primary;
+    font-weight: 600;
+  }
+}
+
+/* List Header */
+.list-header {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid $color-border;
+
+  .list-title {
+    font-size: 2.25rem;
+    font-weight: 900;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.01em;
+    color: $color-text-primary;
+    text-transform: uppercase;
+  }
+
+  .list-subtitle {
+    font-size: 1rem;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+}
+
+/* Filters Toolbar - Modern design with stark inputs */
+.filters-toolbar {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  background-color: $color-bg-card;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-premium;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1 1 200px;
+
+    &.price-filter {
+      flex: 2 1 300px;
+    }
+
+    &.clear-btn-group {
+      flex: 0 0 auto;
+    }
+  }
+
+  .filter-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-secondary;
+  }
+
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .search-icon {
+      position: absolute;
+      right: 1rem;
+      font-size: 0.9rem;
+      color: $color-text-muted;
+      pointer-events: none;
+    }
+  }
+
+  .form-control {
+    width: 100%;
+    background-color: #0c0c0e;
+    border: 1px solid $color-border;
+    border-radius: 8px;
+    color: $color-text-primary;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.3s ease;
+
+    &:focus {
+      border-color: $color-border-hover;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+      background-color: #101012;
+    }
+
+    &::placeholder {
+      color: $color-text-muted;
+    }
+  }
+
+  .price-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .price-input {
+      flex: 1;
+    }
+
+    .price-separator {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: $color-text-muted;
+    }
+  }
+
+  /* Browser specific number input arrows hide */
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
+
+  .select-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238e8e93'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem;
+    padding-right: 2.5rem;
+  }
+
+  .btn-clear-filters {
+    background-color: transparent;
+    border: 1px solid $color-border;
+    color: $color-text-secondary;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: $color-border-hover;
+      color: $color-text-primary;
+    }
+  }
+}
+
+/* Grid Section */
+.grid-section {
+  min-height: 400px;
+}
+
+.accounts-grid, .loading-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+/* Premium Rounded Account Card */
+.account-card {
+  background-color: $color-bg-card;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-premium;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    border-color: $color-border-hover;
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.03);
+
+    .account-thumbnail {
+      transform: scale(1.05);
+    }
+  }
+
+  /* Card Media Thumbnail Area */
+  .card-media {
+    position: relative;
+    height: 180px;
+    background-color: #0c0c0e;
+    overflow: hidden;
+
+    .account-thumbnail {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .media-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 3rem;
+      background: linear-gradient(135deg, #18181b 0%, #09090b 100%);
+    }
+
+    /* Status badges with custom tones */
+    .status-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      z-index: 5;
+
+      &.available {
+        background-color: rgba(48, 209, 88, 0.15);
+        color: $color-success;
+        border: 1px solid rgba(48, 209, 88, 0.3);
+      }
+
+      &.pending {
+        background-color: rgba(255, 159, 10, 0.15);
+        color: $color-warning;
+        border: 1px solid rgba(255, 159, 10, 0.3);
+      }
+
+      &.sold {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: $color-text-muted;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+
+  /* Card content details */
+  .card-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0.75rem;
+  }
+
+  .game-tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-secondary;
+  }
+
+  .account-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 0;
+    color: $color-text-primary;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .account-desc {
+    font-size: 0.85rem;
+    color: $color-text-secondary;
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.55rem;
+  }
+
+  .card-price-row {
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid $color-border;
+  }
+
+  .price-wrapper {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+
+    .price-label {
+      font-size: 0.8rem;
+      color: $color-text-muted;
+      font-weight: 600;
+    }
+
+    .price-value {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: $color-text-primary;
+      font-family: inherit;
+    }
+  }
+
+  .card-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+  }
+
+  .btn-view-details {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    width: 100%;
+    background-color: transparent;
+    border: 1px solid $color-border;
+    color: $color-text-primary;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    outline: none;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: $color-action-bg;
+      color: $color-action-text;
+      border-color: $color-action-bg;
+    }
+  }
+
+  /* Sold state card stylings (grayscale + fade) */
+  &.sold {
+    border-color: $color-border;
+    opacity: 0.65;
+
+    .card-media {
+      .account-thumbnail {
+        filter: grayscale(100%);
+      }
+    }
+
+    .price-value {
+      color: $color-text-secondary;
+      text-decoration: line-through;
+    }
+
+    &:hover {
+      transform: none;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      border-color: $color-border;
+
+      .btn-view-details {
+        background-color: transparent;
+        color: $color-text-primary;
+        border-color: $color-border;
+      }
+    }
+  }
+
+  /* Pending state warning accent */
+  &.pending {
+    border-color: rgba(255, 159, 10, 0.2);
+
+    &:hover {
+      border-color: rgba(255, 159, 10, 0.5);
+    }
+  }
+}
+
+/* Empty State Styling */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 5rem 2rem;
+  background-color: $color-bg-card;
+  border: 1px dashed $color-border;
+  border-radius: $border-radius-premium;
+  max-width: 500px;
+  margin: 3rem auto;
+
+  .empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .empty-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: $color-text-primary;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .empty-description {
+    font-size: 0.95rem;
+    color: $color-text-secondary;
+    line-height: 1.6;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .btn-reset-empty {
+    background-color: $color-action-bg;
+    color: $color-action-text;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #e5e5ea;
+    }
+  }
+}
+
+/* Skeleton Loading Cards styling */
+.skeleton-card {
+  pointer-events: none;
+
+  .skeleton {
+    background: linear-gradient(90deg, #18181b 25%, #27272a 50%, #18181b 75%);
+    background-size: 200% 100%;
+    animation: loading-pulse 1.5s infinite;
+    border-radius: 4px;
+  }
+
+  .skeleton-media {
+    height: 180px;
+    border-radius: 0;
+  }
+
+  .skeleton-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 80px;
+    height: 24px;
+    border-radius: 4px;
+  }
+
+  .skeleton-title {
+    width: 80%;
+    height: 20px;
+    margin-top: 0.5rem;
+  }
+
+  .skeleton-price {
+    width: 50%;
+    height: 24px;
+    margin-top: 0.5rem;
+  }
+
+  .skeleton-btn {
+    width: 100%;
+    height: 38px;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+  }
+}
+
+@keyframes loading-pulse {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

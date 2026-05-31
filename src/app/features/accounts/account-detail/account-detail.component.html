@@ -1,0 +1,204 @@
+<div class="account-detail-container">
+  
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumb-nav">
+    <a routerLink="/" class="breadcrumb-link">Trang chủ</a>
+    <span class="breadcrumb-separator">/</span>
+    @if (account()?.game) {
+      <a [routerLink]="['/game', account()?.game?.slug]" class="breadcrumb-link">{{ account()?.game?.name }}</a>
+      <span class="breadcrumb-separator">/</span>
+    }
+    <span class="breadcrumb-active">{{ account()?.title }}</span>
+  </nav>
+
+  @if (accountService.loading()) {
+    <div class="skeleton-detail-layout">
+      <div class="skeleton-left">
+        <div class="skeleton skeleton-gallery"></div>
+        <div class="skeleton skeleton-description"></div>
+      </div>
+      <div class="skeleton-right">
+        <div class="skeleton skeleton-sidebar"></div>
+      </div>
+    </div>
+  } @else {
+    @if (!account()) {
+      <div class="error-state">
+        <div class="error-icon">⚠️</div>
+        <h3 class="error-title">Không tìm thấy tài khoản</h3>
+        <p class="error-description">Tài khoản này không tồn tại hoặc đã bị gỡ khỏi hệ thống.</p>
+        <a routerLink="/" class="btn-back-home">Quay lại trang chủ</a>
+      </div>
+    } @else {
+      <!-- Main Content Layout -->
+      <div class="detail-layout">
+        
+        <!-- Left Panel: Gallery & Description -->
+        <main class="detail-main">
+          <!-- Gallery -->
+          <section class="gallery-wrapper">
+            <div class="main-image-box">
+              @if (account()!.images && account()!.images.length > 0) {
+                <img [src]="account()!.images[selectedImageIndex()]" [alt]="account()!.title" class="main-image" />
+              } @else {
+                <div class="main-image-placeholder">🎮</div>
+              }
+            </div>
+
+            @if (account()!.images && account()!.images.length > 1) {
+              <div class="thumbnails-grid">
+                @for (img of account()!.images; track img; let idx = $index) {
+                  <button 
+                    (click)="selectedImageIndex.set(idx)" 
+                    class="thumbnail-btn" 
+                    [class.active]="selectedImageIndex() === idx"
+                  >
+                    <img [src]="img" alt="Thumbnail" class="thumbnail-img" />
+                  </button>
+                }
+              </div>
+            }
+          </section>
+
+          <!-- Description Section -->
+          <section class="description-section">
+            <h2 class="section-title">Mô Tả Chi Tiết</h2>
+            <div class="description-content">
+              <p>{{ account()!.description || 'Không có mô tả chi tiết cho tài khoản này.' }}</p>
+            </div>
+            
+            <!-- Features List -->
+            <div class="account-spec-table">
+              <div class="spec-row">
+                <span class="spec-label">Hệ thống</span>
+                <span class="spec-value">PC & Mobile</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-label">Trạng thái thông tin</span>
+                <span class="spec-value">Trắng thông tin (Thay đổi được)</span>
+              </div>
+              <div class="spec-row">
+                <span class="spec-label">Hình thức giao dịch</span>
+                <span class="spec-value">Realtime tự động 24/7</span>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <!-- Right Panel: Sidebar Purchase Card / Secure Credentials -->
+        <aside class="detail-sidebar">
+          <div class="sidebar-card">
+            <div class="card-header">
+              <span class="game-tag">{{ account()!.game?.name }}</span>
+              <h1 class="account-title">{{ account()!.title }}</h1>
+            </div>
+
+            <div class="card-status-row">
+              <span class="status-label">Trạng thái:</span>
+              <span class="status-badge" [class]="account()!.status">
+                @switch (account()!.status) {
+                  @case ('available') { Sẵn sàng giao dịch }
+                  @case ('pending') { Đang được đặt giữ }
+                  @case ('sold') { Đã bán }
+                }
+              </span>
+            </div>
+
+            <div class="card-price-box">
+              <span class="price-label">Giá thanh toán</span>
+              <span class="price-value">{{ account()!.price | number:'1.0-0' }}đ</span>
+            </div>
+
+            <!-- Call to Actions -->
+            <div class="card-actions">
+              @if (!authService.isAuthenticated()) {
+                <a routerLink="/auth" class="btn-action btn-login-cta">
+                  Đăng Nhập Để Mua
+                </a>
+                <p class="action-helper-text">Vui lòng đăng nhập tài khoản GmiosShop để thực hiện giao dịch an toàn.</p>
+              } @else {
+                @if (isPurchased()) {
+                  <div class="purchased-badge-panel">
+                    <span class="success-icon">✓</span>
+                    <span class="purchased-text">Bạn đã sở hữu tài khoản này</span>
+                  </div>
+                } @else if (account()!.status === 'available') {
+                  <button (click)="handleBuy()" class="btn-action btn-buy-cta">
+                    Mua Ngay
+                  </button>
+                  <p class="action-helper-text">Giao dịch được xử lý tự động qua VietQR Realtime siêu tốc.</p>
+                } @else {
+                  <button class="btn-action btn-disabled" disabled>
+                    Tài Khoản Không Sẵn Sàng
+                  </button>
+                  <p class="action-helper-text">Tài khoản đã được đặt hàng hoặc đã bán cho khách hàng khác.</p>
+                }
+              }
+            </div>
+          </div>
+
+          <!-- Secure Credentials Card (Visible if current user purchased) -->
+          @if (authService.isAuthenticated() && isPurchased()) {
+            <div class="credentials-card">
+              <div class="cred-header">
+                <span class="lock-icon">🔒</span>
+                <h3 class="cred-title">Thông Tin Đăng Nhập Game</h3>
+              </div>
+              
+              @if (loadingCredentials()) {
+                <div class="cred-loader">
+                  <div class="spinner"></div>
+                  <span>Đang tải thông tin bảo mật...</span>
+                </div>
+              } @else {
+                @if (credentials()) {
+                  <div class="cred-fields">
+                    <div class="cred-field">
+                      <label class="cred-label">Tài khoản (Username)</label>
+                      <div class="cred-input-row">
+                        <input type="text" [value]="credentials()!.username" readonly class="cred-input" />
+                        <button (click)="copyToClipboard(credentials()!.username, 'user')" class="btn-copy">
+                          {{ copyStatus()['user'] ? 'Đã chép ✓' : 'Sao chép' }}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="cred-field">
+                      <label class="cred-label">Mật khẩu (Password)</label>
+                      <div class="cred-input-row">
+                        <input type="text" [value]="credentials()!.password" readonly class="cred-input" />
+                        <button (click)="copyToClipboard(credentials()!.password, 'pass')" class="btn-copy">
+                          {{ copyStatus()['pass'] ? 'Đã chép ✓' : 'Sao chép' }}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="cred-warning">
+                      <span class="warning-bullet">⚠️</span>
+                      <p class="warning-text">Vui lòng thay đổi thông tin mật khẩu đăng nhập game và liên kết email/số điện thoại cá nhân ngay sau khi nhận tài khoản để đảm bảo an toàn tuyệt đối.</p>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="cred-error">
+                    <p>Không thể truy xuất thông tin tài khoản. Vui lòng liên hệ hỗ trợ.</p>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </aside>
+
+      </div>
+    }
+  }
+
+  <!-- Standalone VietQR Checkout Modal (Task 8) -->
+  @if (showCheckout() && orderService.activeOrder()) {
+    <app-checkout-modal 
+      [order]="orderService.activeOrder()!" 
+      (close)="closeCheckout()" 
+      (success)="onPaymentSuccess()"
+    ></app-checkout-modal>
+  }
+  
+</div>

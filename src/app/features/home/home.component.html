@@ -4,7 +4,7 @@
   <section class="hero-section">
     <div class="hero-content">
       <h1 class="hero-title">ĐẲNG CẤP CHIẾN GAME</h1>
-      <p class="hero-lead">Sở hữu ngay tài khoản Lol, FC Online, Liên Quân Mobile uy tín, bảo mật tuyệt đối với hệ thống giao dịch tự động Realtime.</p>
+      <p class="hero-lead">Sở hữu ngay tài khoản LMHT, FC Online, Liên Quân Mobile uy tín, bảo mật tuyệt đối với hệ thống giao dịch tự động Realtime.</p>
       
       @if (!authService.isAuthenticated()) {
         <div class="hero-actions">
@@ -23,18 +23,37 @@
   <!-- Categories Section -->
   <section class="categories-section">
     <h2 class="section-title">DANH MỤC TRÒ CHƠI</h2>
-    <div class="games-grid">
-      @for (game of gamesList; track game.slug) {
-        <div class="game-card">
-          <div class="game-icon">{{ game.icon }}</div>
-          <h3 class="game-name">{{ game.name }}</h3>
-          <p class="game-count">{{ game.count }}</p>
-          <div class="game-card-footer">
-            <span class="view-catalog-link">Xem Danh Sách →</span>
+    
+    @if (accountService.loading()) {
+      <div class="loading-grid">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="game-card skeleton-card">
+            <div class="skeleton skeleton-icon"></div>
+            <div class="skeleton skeleton-title"></div>
+            <div class="skeleton skeleton-subtitle"></div>
           </div>
-        </div>
-      }
-    </div>
+        }
+      </div>
+    } @else {
+      <div class="games-grid">
+        @for (game of accountService.games(); track game.slug) {
+          <div class="game-card" [routerLink]="['/game', game.slug]">
+            @if (game.image_url) {
+              <div class="game-card-bg" [style.backgroundImage]="'url(' + game.image_url + ')'"></div>
+            }
+            <div class="game-card-overlay"></div>
+            <div class="game-card-content">
+              <div class="game-icon"><img [src]="getGameIcon(game.slug)" alt="{{ game.name }} logo" width="48" height="48" /></div>
+              <h3 class="game-name">{{ game.name }}</h3>
+              <p class="game-count">Khám phá kho tài khoản cực phẩm</p>
+              <div class="game-card-footer">
+                <span class="view-catalog-link">Xem Danh Sách →</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
   </section>
   
 </div>

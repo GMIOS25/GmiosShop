@@ -1,0 +1,82 @@
+<div class="checkout-overlay">
+  <div class="checkout-modal">
+    <button (click)="handleCancel()" [disabled]="isCancelling()" class="btn-close-modal">✕</button>
+    
+    <header class="modal-header">
+      <h2 class="modal-title">Thanh Toán Đơn Hàng</h2>
+      <p class="modal-subtitle">Vui lòng quét mã VietQR hoặc chuyển khoản theo thông tin chi tiết</p>
+    </header>
+
+    <main class="modal-content">
+      <!-- Left side: VietQR Code -->
+      <section class="modal-qr-section">
+        <div class="qr-container">
+          <img [src]="vietQrUrl()" alt="VietQR Chuyển Khoản" class="vietqr-img" />
+        </div>
+        <div class="timer-display">
+          <span class="timer-icon">🕒</span>
+          <span class="timer-text">Hiệu lực thanh toán: <strong>{{ formattedTime() }}</strong></span>
+        </div>
+      </section>
+
+      <!-- Right side: Bank Details -->
+      <section class="modal-details-section">
+        <div class="detail-row">
+          <span class="detail-label">Ngân hàng</span>
+          <span class="detail-value">{{ bankId }}</span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-label">Số tài khoản</span>
+          <div class="detail-value-wrapper">
+            <span class="detail-value bold">{{ bankAccountNo }}</span>
+            <button (click)="copyToClipboard(bankAccountNo, 'accNo')" class="btn-copy-small">
+              {{ copyStatus()['accNo'] ? 'Đã chép ✓' : 'Sao chép' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Chủ tài khoản</span>
+          <span class="detail-value">{{ bankAccountName }}</span>
+        </div>
+
+        <div class="detail-row highlight-row">
+          <span class="detail-label">Số tiền chuyển</span>
+          <div class="detail-value-wrapper">
+            <span class="detail-value price">{{ order.amount | number:'1.0-0' }}đ</span>
+            <button (click)="copyToClipboard(order.amount.toString(), 'amount')" class="btn-copy-small">
+              {{ copyStatus()['amount'] ? 'Đã chép ✓' : 'Sao chép' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="detail-row highlight-row content-row">
+          <span class="detail-label">Nội dung chuyển khoản (BẮT BUỘC ĐÚNG)</span>
+          <div class="detail-value-wrapper">
+            <span class="detail-value bold code-text">{{ order.payment_code }}</span>
+            <button (click)="copyToClipboard(order.payment_code, 'code')" class="btn-copy-small">
+              {{ copyStatus()['code'] ? 'Đã chép ✓' : 'Sao chép' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Waiting System Notice -->
+        <div class="realtime-notice">
+          <div class="loader-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <p class="notice-text">Hệ thống đang tự động kiểm tra giao dịch chuyển khoản realtime. Vui lòng giữ nguyên màn hình này, tài khoản sẽ được cấp ngay khi nhận được tiền.</p>
+        </div>
+      </section>
+    </main>
+    
+    <footer class="modal-footer">
+      <button (click)="handleCancel()" [disabled]="isCancelling()" class="btn-cancel-checkout">
+        {{ isCancelling() ? 'Đang hủy...' : 'Hủy Giao Dịch' }}
+      </button>
+    </footer>
+  </div>
+</div>

@@ -1,0 +1,153 @@
+<div class="account-list-container">
+  
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumb-nav">
+    <a routerLink="/" class="breadcrumb-link">Trang chủ</a>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-active">{{ activeGame()?.name || 'Tài khoản' }}</span>
+  </nav>
+
+  <!-- Header Banner -->
+  <header class="list-header">
+    <div class="header-content">
+      <h1 class="list-title">{{ activeGame()?.name || 'CỬA HÀNG TÀI KHOẢN' }}</h1>
+      <p class="list-subtitle">Khám phá kho siêu phẩm tài khoản game uy tín, an toàn bậc nhất Việt Nam.</p>
+    </div>
+  </header>
+
+  <!-- Filters Toolbar -->
+  <section class="filters-toolbar">
+    <div class="filter-group search-box">
+      <label class="filter-label">Tìm kiếm</label>
+      <div class="input-wrapper">
+        <input 
+          type="text" 
+          [ngModel]="searchQuery()" 
+          (ngModelChange)="searchQuery.set($event)" 
+          placeholder="Nhập tiêu đề, mô tả hoặc rank..." 
+          class="form-control filter-input"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+    </div>
+
+    <div class="filter-group price-filter">
+      <label class="filter-label">Khoảng giá (VND)</label>
+      <div class="price-inputs">
+        <input 
+          type="number" 
+          [ngModel]="minPrice()" 
+          (ngModelChange)="minPrice.set($event === '' || $event === null ? null : +$event)" 
+          placeholder="Giá từ" 
+          class="form-control price-input"
+          min="0"
+        />
+        <span class="price-separator">to</span>
+        <input 
+          type="number" 
+          [ngModel]="maxPrice()" 
+          (ngModelChange)="maxPrice.set($event === '' || $event === null ? null : +$event)" 
+          placeholder="đến" 
+          class="form-control price-input"
+          min="0"
+        />
+      </div>
+    </div>
+
+    <div class="filter-group sort-box">
+      <label class="filter-label">Sắp xếp</label>
+      <select 
+        [ngModel]="sortBy()" 
+        (ngModelChange)="sortBy.set($event)" 
+        class="form-control select-input"
+      >
+        <option value="newest">Mới nhất</option>
+        <option value="price_asc">Giá tăng dần</option>
+        <option value="price_desc">Giá giảm dần</option>
+      </select>
+    </div>
+
+    @if (searchQuery() || minPrice() !== null || maxPrice() !== null || sortBy() !== 'newest') {
+      <div class="filter-group clear-btn-group">
+        <button (click)="resetFilters()" class="btn-clear-filters">
+          Xóa Bộ Lọc ✕
+        </button>
+      </div>
+    }
+  </section>
+
+  <!-- Accounts Grid / Loading / Empty -->
+  <main class="grid-section">
+    @if (accountService.loading()) {
+      <div class="loading-grid">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <div class="account-card skeleton-card">
+            <div class="skeleton skeleton-media"></div>
+            <div class="skeleton skeleton-badge"></div>
+            <div class="skeleton skeleton-title"></div>
+            <div class="skeleton skeleton-price"></div>
+            <div class="skeleton skeleton-btn"></div>
+          </div>
+        }
+      </div>
+    } @else {
+      @if (filteredAccounts().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">📂</div>
+          <h3 class="empty-title">Không tìm thấy tài khoản</h3>
+          <p class="empty-description">Rất tiếc, không tìm thấy tài khoản nào khớp với bộ lọc hiện tại của bạn. Vui lòng thử lại với cấu hình khác.</p>
+          <button (click)="resetFilters()" class="btn-reset-empty">Xem tất cả</button>
+        </div>
+      } @else {
+        <div class="accounts-grid">
+          @for (account of filteredAccounts(); track account.id) {
+            <div class="account-card" [class.sold]="account.status === 'sold'" [class.pending]="account.status === 'pending'">
+              <!-- Thumbnail -->
+              <div class="card-media">
+                @if (account.images && account.images.length > 0) {
+                  <img [src]="account.images[0]" [alt]="account.title" class="account-thumbnail" />
+                } @else {
+                  <div class="media-placeholder">🎮</div>
+                }
+                
+                <!-- Status Badge -->
+                <div class="status-badge" [class]="account.status">
+                  @switch (account.status) {
+                    @case ('available') { Sẵn sàng }
+                    @case ('pending') { Đang giữ }
+                    @case ('sold') { Đã bán }
+                  }
+                </div>
+              </div>
+
+              <!-- Content -->
+              <div class="card-content">
+                <span class="game-tag">{{ account.game?.name }}</span>
+                <h3 class="account-title" [title]="account.title">{{ account.title }}</h3>
+                <p class="account-desc">{{ account.description || 'Không có mô tả chi tiết cho tài khoản này.' }}</p>
+                
+                <div class="card-price-row">
+                  <div class="price-wrapper">
+                    <span class="price-label">Giá bán:</span>
+                    <span class="price-value">{{ account.price | number:'1.0-0' }}đ</span>
+                  </div>
+                </div>
+
+                <div class="card-footer">
+                  <a [routerLink]="['/account', account.id]" class="btn-view-details">
+                    @if (account.status === 'sold') {
+                      Xem Chi Tiết ✓
+                    } @else {
+                      Xem Chi Tiết →
+                    }
+                  </a>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </main>
+  
+</div>

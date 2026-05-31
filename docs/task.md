@@ -11,8 +11,8 @@
   - `[x]` **Task 6**: Cài đặt Supabase JS SDK, viết `SupabaseService`, `AccountService` và `OrderService` sử dụng Signals.
   - `[x]` **Task 6.5**: Triển khai component `AuthComponent` (Đăng ký / Đăng nhập).
 - `[ ]` Phase 4: UI/UX & Realtime Integration
-  - `[ ]` **Task 7**: Triển khai các component: `HomeComponent`, `AccountListComponent`, `AccountDetailComponent`.
-  - `[ ]` **Task 8**: Triển khai `CheckoutModalComponent` hiển thị thông tin chuyển khoản VietQR và lắng nghe sự thay đổi trạng thái đơn hàng theo thời gian thực (Supabase Realtime).
+  - `[x]` **Task 7**: Triển khai các component: `HomeComponent`, `AccountListComponent`, `AccountDetailComponent`.
+  - `[x]` **Task 8**: Triển khai `CheckoutModalComponent` hiển thị thông tin chuyển khoản VietQR và lắng nghe sự thay đổi trạng thái đơn hàng theo thời gian thực (Supabase Realtime).
 - `[ ]` Phase X: Verification
   - `[ ]` Kiểm tra màu sắc (không dùng màu tím/violet).
   - `[ ]` Chạy script checklist.py.

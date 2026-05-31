@@ -22,6 +22,7 @@ export class AccountService {
   constructor(private supabaseService: SupabaseService) {}
 
   async loadGames(): Promise<void> {
+    if (!this.supabaseService.isBrowserEnv) return;
     this.#loading.set(true);
     try {
       const { data, error } = await this.supabaseService.client
@@ -39,6 +40,7 @@ export class AccountService {
   }
 
   async loadAccounts(gameId?: string): Promise<void> {
+    if (!this.supabaseService.isBrowserEnv) return;
     this.#loading.set(true);
     try {
       let query = this.supabaseService.client
@@ -64,6 +66,7 @@ export class AccountService {
   }
 
   async loadAccountDetails(id: string): Promise<void> {
+    if (!this.supabaseService.isBrowserEnv) return;
     this.#loading.set(true);
     try {
       const { data, error } = await this.supabaseService.client
