@@ -46,7 +46,9 @@ Thumbs.db
 # agent file
 .agent/*
 
-# Environment variables
+# Angular environment files (contains API keys)
+src/environments/environment.ts
+src/environments/environment.production.ts
 .env
 .env.local
 .env.development
@@ -54,4 +56,5 @@ Thumbs.db
 supabase/functions/.env
 supabase/functions/.env.local
 
+#doc
 docs/*
