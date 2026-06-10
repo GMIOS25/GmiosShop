@@ -1,6 +1,6 @@
 {
   "buildCommand": "node scripts/generate-env.js && ng build",
-  "outputDirectory": "dist/GmiosShop",
+  "outputDirectory": "dist/GmiosShop/browser",
   "framework": null,
   "rewrites": [
     {
