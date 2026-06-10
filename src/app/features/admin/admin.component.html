@@ -1,0 +1,475 @@
+<div class="admin-container">
+  <!-- Section Title -->
+  <div class="admin-header-section">
+    <div class="title-area">
+      <h1>Hệ Thống Quản Trị</h1>
+      <p class="subtitle">Bảng quản lý tài nguyên, doanh thu và vận hành hệ thống GmiosShop</p>
+    </div>
+    
+    <!-- Tab Controls -->
+    <div class="tab-controls">
+      <button 
+        (click)="onTabChange('dashboard')" 
+        [class.active]="activeTab() === 'dashboard'" 
+        class="tab-btn">
+        <span class="btn-text">Tổng Quan</span>
+      </button>
+      <button 
+        (click)="onTabChange('games')" 
+        [class.active]="activeTab() === 'games'" 
+        class="tab-btn">
+        <span class="btn-text">Quản Lý Game</span>
+      </button>
+      <button 
+        (click)="onTabChange('accounts')" 
+        [class.active]="activeTab() === 'accounts'" 
+        class="tab-btn">
+        <span class="btn-text">Quản Lý Account</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="admin-content-area">
+    <!-- 1. TAB DASHBOARD -->
+    @if (activeTab() === 'dashboard') {
+      <div class="tab-content dashboard-tab animate-fade-in">
+        @if (loadingStats()) {
+          <div class="tab-loader">
+            <div class="spinner"></div>
+            <p>Đang tải số liệu thống kê...</p>
+          </div>
+        } @else {
+          <!-- Stats Grid -->
+          <div class="stats-grid">
+            <!-- Stat Card: Revenue -->
+            <div class="stat-card highlight">
+              <div class="stat-meta">Tổng Doanh Thu</div>
+              <div class="stat-value text-success">{{ stats().totalRevenue | currency:'VND':'symbol':'1.0-0' }}</div>
+              <div class="stat-footer">Từ các đơn hàng đã thanh toán thành công</div>
+            </div>
+
+            <!-- Stat Card: Accounts -->
+            <div class="stat-card">
+              <div class="stat-meta">Quản Lý Tài Khoản</div>
+              <div class="stat-value">{{ stats().totalAccounts }}</div>
+              <div class="stat-footer">
+                <span class="badge available">{{ stats().availableAccounts }} trống</span>
+                <span class="badge sold">{{ stats().soldAccounts }} đã bán</span>
+                <span class="badge pending">{{ stats().pendingAccounts }} đang chờ</span>
+              </div>
+            </div>
+
+            <!-- Stat Card: Orders -->
+            <div class="stat-card">
+              <div class="stat-meta">Tổng Đơn Hàng</div>
+              <div class="stat-value">{{ stats().totalOrders }}</div>
+              <div class="stat-footer">
+                <span class="badge paid">{{ stats().paidOrders }} đã mua</span>
+                <span class="badge pending">{{ stats().pendingOrders }} chờ CK</span>
+                <span class="badge expired">{{ stats().expiredOrders }} hết hạn</span>
+              </div>
+            </div>
+
+            <!-- Stat Card: Games -->
+            <div class="stat-card">
+              <div class="stat-meta">Danh Mục Game</div>
+              <div class="stat-value">{{ stats().totalGames }}</div>
+              <div class="stat-footer">Các tựa game đang được bày bán</div>
+            </div>
+          </div>
+
+          <!-- Direct Database Info & Operational Notes -->
+          <div class="admin-info-box">
+            <h3>Nhật ký vận hành Admin</h3>
+            <ul>
+              <li>Hệ thống RLS đã được kích hoạt. Chỉ các tài khoản có phân quyền <span class="text-white">admin</span> trong bảng <span class="code">user_roles</span> mới có thể thực hiện thao tác ghi/xóa.</li>
+              <li>Toàn bộ thông tin đăng nhập của tài khoản (credentials) được mã hóa/cách ly ở bảng riêng biệt để tăng cường bảo mật.</li>
+              <li>Ảnh tải lên được lưu trữ trực tiếp trên Cloudinary thông qua Supabase Edge Functions.</li>
+            </ul>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- 2. TAB GAMES -->
+    @if (activeTab() === 'games') {
+      <div class="tab-content games-tab animate-fade-in">
+        <div class="action-header">
+          <h2>Danh Sách Game</h2>
+          <button (click)="openAddGameModal()" class="btn btn-primary">
+            + Thêm Game Mới
+          </button>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Tên Game</th>
+                <th>Slug đường dẫn</th>
+                <th>Ảnh đại diện</th>
+                <th class="text-right">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (accountService.games().length === 0) {
+                <tr>
+                  <td colspan="4" class="text-center empty-row">Chưa có tựa game nào được tạo.</td>
+                </tr>
+              } @else {
+                @for (game of accountService.games(); track game.id) {
+                  <tr>
+                    <td class="font-bold">{{ game.name }}</td>
+                    <td><span class="code">{{ game.slug }}</span></td>
+                    <td>
+                      @if (game.image_url) {
+                        <img [src]="game.image_url" alt="Game Logo" [alt]="game.name" class="table-thumb" />
+                      } @else {
+                        <span class="no-image">Không có ảnh</span>
+                      }
+                    </td>
+                    <td class="text-right actions-cell">
+                      <button (click)="openEditGameModal(game)" class="btn-action edit" title="Chỉnh sửa"></button>
+                      <button (click)="deleteGame(game.id)" class="btn-action delete" title="Xóa"></button>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- 3. TAB ACCOUNTS -->
+    @if (activeTab() === 'accounts') {
+      <div class="tab-content accounts-tab animate-fade-in">
+        <div class="action-header">
+          <h2>Danh Sách Tài Khoản Game</h2>
+          
+          <div class="filter-controls">
+            <!-- Game Filter -->
+            <div class="select-wrapper">
+              <select 
+                [ngModel]="filterGameId()" 
+                (ngModelChange)="filterGameId.set($event)"
+                class="form-select">
+                <option value="">Tất cả các Game</option>
+                @for (game of accountService.games(); track game.id) {
+                  <option [value]="game.id">{{ game.name }}</option>
+                }
+              </select>
+            </div>
+
+            <button (click)="openAddAccountModal()" class="btn btn-primary">
+              + Thêm Tài Khoản
+            </button>
+          </div>
+        </div>
+
+        @if (accountService.loading()) {
+          <div class="tab-loader">
+            <div class="spinner"></div>
+            <p>Đang tải danh sách tài khoản...</p>
+          </div>
+        } @else {
+          <div class="table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Tiêu đề tài khoản</th>
+                  <th>Tựa Game</th>
+                  <th>Giá tiền</th>
+                  <th>Trạng thái</th>
+                  <th>Ảnh mô tả</th>
+                  <th class="text-right">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (filteredAccounts().length === 0) {
+                  <tr>
+                    <td colspan="6" class="text-center empty-row">Không tìm thấy tài khoản game nào.</td>
+                  </tr>
+                } @else {
+                  @for (acc of filteredAccounts(); track acc.id) {
+                    <tr>
+                      <td class="font-bold max-w-xs truncate" [title]="acc.title">{{ acc.title }}</td>
+                      <td>{{ acc.game?.name }}</td>
+                      <td class="font-mono">{{ acc.price | currency:'VND':'symbol':'1.0-0' }}</td>
+                      <td>
+                        <span class="badge" [ngClass]="acc.status">
+                          {{ acc.status === 'available' ? 'Còn hàng' : acc.status === 'sold' ? 'Đã bán' : 'Chờ xử lý' }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="images-count">
+                          {{ acc.images.length || 0 }} ảnh
+                        </span>
+                      </td>
+                      <td class="text-right actions-cell">
+                        <button (click)="deleteAccount(acc)" class="btn-action delete" title="Xóa tài khoản và dọn dẹp ảnh"></button>
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL: FORM GAME (THÊM / SỬA) -->
+<!-- ========================================== -->
+@if (showGameModal()) {
+  <div class="modal-overlay" (click)="showGameModal.set(false)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ gameFormId() ? 'Chỉnh Sửa Game' : 'Thêm Game Mới' }}</h3>
+        <button (click)="showGameModal.set(false)" class="close-btn">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        @if (gameFormError()) {
+          <div class="alert alert-danger">{{ gameFormError() }}</div>
+        }
+        @if (gameFormSuccess()) {
+          <div class="alert alert-success">{{ gameFormSuccess() }}</div>
+        }
+
+        <form (ngSubmit)="saveGame()" class="admin-form">
+          <div class="form-group">
+            <label for="gameName">Tên Game <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="gameName" 
+              [ngModel]="gameFormName()" 
+              (ngModelChange)="onGameNameChange($event)"
+              name="gameName" 
+              placeholder="Ví dụ: Liên Minh Huyền Thoại"
+              class="form-control"
+              required />
+          </div>
+
+          <div class="form-group">
+            <label for="gameSlug">Slug đường dẫn (Auto-generate)</label>
+            <input 
+              type="text" 
+              id="gameSlug" 
+              [ngModel]="gameFormSlug()" 
+              (ngModelChange)="gameFormSlug.set($event)"
+              name="gameSlug" 
+              placeholder="Ví dụ: lien-minh-huyen-thoai"
+              class="form-control font-mono" />
+          </div>
+
+          <div class="form-group">
+            <label for="gameImageUrl">Ảnh đại diện (URL URL)</label>
+            <input 
+              type="url" 
+              id="gameImageUrl" 
+              [ngModel]="gameFormImageUrl()" 
+              (ngModelChange)="gameFormImageUrl.set($event)"
+              name="gameImageUrl" 
+              placeholder="https://images.unsplash.com/..."
+              class="form-control" />
+          </div>
+
+          <div class="modal-footer-actions">
+            <button 
+              type="button" 
+              (click)="showGameModal.set(false)" 
+              class="btn btn-secondary"
+              [disabled]="actionLoading()">
+              Hủy bỏ
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="actionLoading()">
+              {{ actionLoading() ? 'Đang xử lý...' : (gameFormId() ? 'Cập Nhật' : 'Tạo Mới') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ========================================== -->
+<!-- MODAL: FORM THÊM TÀI KHOẢN GAME -->
+<!-- ========================================== -->
+@if (showAccountModal()) {
+  <div class="modal-overlay" (click)="!actionLoading() && showAccountModal.set(false)">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Thêm Tài Khoản Game Mới</h3>
+        <button (click)="!actionLoading() && showAccountModal.set(false)" class="close-btn" [disabled]="actionLoading()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        @if (accountFormError()) {
+          <div class="alert alert-danger">{{ accountFormError() }}</div>
+        }
+        @if (accountFormSuccess()) {
+          <div class="alert alert-success">{{ accountFormSuccess() }}</div>
+        }
+
+        <form (ngSubmit)="saveAccount()" class="admin-form">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="accGame">Thuộc Game <span class="required">*</span></label>
+              <div class="select-wrapper">
+                <select 
+                  id="accGame" 
+                  [ngModel]="accountFormGameId()" 
+                  (ngModelChange)="accountFormGameId.set($event)"
+                  name="accGame"
+                  class="form-control"
+                  required>
+                  @for (game of accountService.games(); track game.id) {
+                    <option [value]="game.id">{{ game.name }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="accPrice">Giá bán (VND) <span class="required">*</span></label>
+              <input 
+                type="number" 
+                id="accPrice" 
+                [ngModel]="accountFormPrice()" 
+                (ngModelChange)="accountFormPrice.set($event)"
+                name="accPrice" 
+                placeholder="Ví dụ: 150000"
+                class="form-control font-mono"
+                min="0"
+                required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="accTitle">Tiêu đề Account <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="accTitle" 
+              [ngModel]="accountFormTitle()" 
+              (ngModelChange)="accountFormTitle.set($event)"
+              name="accTitle" 
+              placeholder="Nhập tiêu đề VIP, số lượng skin, cấp bậc..."
+              class="form-control"
+              required />
+          </div>
+
+          <div class="form-group">
+            <label for="accDesc">Mô tả chi tiết</label>
+            <textarea 
+              id="accDesc" 
+              [ngModel]="accountFormDescription()" 
+              (ngModelChange)="accountFormDescription.set($event)"
+              name="accDesc" 
+              rows="3"
+              placeholder="Nhập các thuộc tính, tướng, trang phục đặc biệt..."
+              class="form-control"></textarea>
+          </div>
+
+          <!-- GAME LOGINS / CREDENTIALS (SENSITIVE) -->
+          <div class="form-credentials-section">
+            <div class="section-title">Thông Tin Đăng Nhập Game (Credentials - Chỉ người mua mới xem được)</div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="accUsername">Tên tài khoản (Login ID) <span class="required">*</span></label>
+                <input 
+                  type="text" 
+                  id="accUsername" 
+                  [ngModel]="accountFormUsername()" 
+                  (ngModelChange)="accountFormUsername.set($event)"
+                  name="accUsername" 
+                  placeholder="Username / Garena ID..."
+                  class="form-control"
+                  required />
+              </div>
+
+              <div class="form-group">
+                <label for="accPassword">Mật khẩu đăng nhập <span class="required">*</span></label>
+                <input 
+                  type="text" 
+                  id="accPassword" 
+                  [ngModel]="accountFormPassword()" 
+                  (ngModelChange)="accountFormPassword.set($event)"
+                  name="accPassword" 
+                  placeholder="Password..."
+                  class="form-control"
+                  required />
+              </div>
+            </div>
+          </div>
+
+          <!-- CLOUDINARY FILE UPLOAD SECTION -->
+          <div class="form-group">
+            <label>Tải lên ảnh mô tả (Tối đa 5 ảnh, tự động upload lên Cloudinary) <span class="required">*</span></label>
+            <div class="file-upload-wrapper">
+              <input 
+                type="file" 
+                id="fileUploadInput" 
+                (change)="onFileSelected($event)" 
+                accept="image/*" 
+                multiple
+                [disabled]="isUploading() || accountFormSelectedFiles().length >= 5"
+                class="hidden-file-input" />
+              <label for="fileUploadInput" class="custom-file-label" [class.disabled]="isUploading() || accountFormSelectedFiles().length >= 5">
+                <span class="upload-icon"></span>
+                <span>{{ isUploading() ? 'Đang upload ảnh lên Cloudinary...' : 'Chọn từ thiết bị (Nhiều ảnh)' }}</span>
+              </label>
+            </div>
+
+            <!-- Upload progress spinner -->
+            @if (isUploading()) {
+              <div class="upload-status-indicator">
+                <span class="spinner-sm"></span>
+                <span>Đang mã hóa chữ ký số và lưu trữ ảnh lên Cloudinary... Vui lòng không đóng cửa sổ.</span>
+              </div>
+            }
+
+            <!-- Previews -->
+            @if (accountFormPreviews().length > 0) {
+              <div class="images-preview-grid">
+                @for (preview of accountFormPreviews(); track preview; let idx = $index) {
+                  <div class="preview-item">
+                    <img [src]="preview" alt="Preview" />
+                    <button 
+                      type="button" 
+                      (click)="removeSelectedFile(idx)" 
+                      class="remove-preview-btn"
+                      [disabled]="isUploading()">&times;</button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="modal-footer-actions">
+            <button 
+              type="button" 
+              (click)="showAccountModal.set(false)" 
+              class="btn btn-secondary"
+              [disabled]="actionLoading()">
+              Hủy bỏ
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="actionLoading()">
+              {{ isUploading() ? 'Đang Upload ảnh...' : actionLoading() ? 'Đang Lưu...' : 'Thêm Tài Khoản' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+<!-- <title> name="description" og: label placeholder aria-label -->

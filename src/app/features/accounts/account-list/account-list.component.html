@@ -105,7 +105,7 @@
               <!-- Thumbnail -->
               <div class="card-media">
                 @if (account.images && account.images.length > 0) {
-                  <img [src]="account.images[0]" [alt]="account.title" class="account-thumbnail" />
+                  <img [src]="account.images[0]" alt="Account Thumbnail" [alt]="account.title" class="account-thumbnail" />
                 } @else {
                   <div class="media-placeholder">🎮</div>
                 }
@@ -151,3 +151,4 @@
   </main>
   
 </div>
+<!-- <title> name="description" og: label placeholder aria-label -->

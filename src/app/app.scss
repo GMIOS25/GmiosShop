@@ -290,3 +290,38 @@ $color-success: #30d158;
     max-width: 110px;
   }
 }
+
+/* Global Loader Styling */
+.global-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: $color-bg-deep;
+  color: $color-text-primary;
+  gap: 1.25rem;
+
+  .loader-text {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+  }
+
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    border-top-color: $color-text-primary;
+    animation: spin-loader 0.7s linear infinite;
+  }
+}
+
+@keyframes spin-loader {
+  to {
+    transform: rotate(360deg);
+  }
+}

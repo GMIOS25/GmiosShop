@@ -1,0 +1,78 @@
+$color-bg-card: #121214;
+$color-border: #26262b;
+$color-border-active: #ffffff;
+$color-text-primary: #ffffff;
+$color-text-secondary: #8e8e93;
+
+.error-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  padding: 1.5rem;
+}
+
+.error-box {
+  background-color: $color-bg-card;
+  border: 1px solid $color-border;
+  border-radius: 2px; /* Thiết kế hình học góc cạnh sắc nét 2px */
+  max-width: 480px;
+  width: 100%;
+  padding: 2.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  text-align: center;
+}
+
+.error-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+
+  .error-icon {
+    font-size: 2.5rem;
+  }
+
+  .error-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+    color: #ff453a; /* Sử dụng màu đỏ cảnh báo, hoàn toàn không màu tím */
+  }
+}
+
+.error-body {
+  margin-bottom: 2rem;
+
+  .error-message {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+}
+
+.error-footer {
+  .back-home-btn {
+    display: inline-block;
+    background-color: transparent;
+    color: $color-text-primary;
+    border: 1px solid $color-border;
+    border-radius: 2px; /* Góc cạnh sắc nét */
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: background-color 0.2s, border-color 0.2s;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: $color-border-active;
+    }
+  }
+}

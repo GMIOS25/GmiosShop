@@ -7,14 +7,20 @@
   - `[x]` **Task 3**: Cấu hình các biến môi trường cho Supabase Edge Functions (SePay + Resend).
   - `[x]` **Task 4**: [DELETE] Không cần Edge Function tạo link thanh toán (QR sinh trực tiếp ở Client-side).
   - `[x]` **Task 5**: Triển khai Edge Function `sepay-webhook` nhận kết quả giao dịch từ SePay và gửi Email qua Resend.
-- `[/]` Phase 3: Angular Infrastructure
+- `[x]` Phase 3: Angular Infrastructure
   - `[x]` **Task 6**: Cài đặt Supabase JS SDK, viết `SupabaseService`, `AccountService` và `OrderService` sử dụng Signals.
   - `[x]` **Task 6.5**: Triển khai component `AuthComponent` (Đăng ký / Đăng nhập).
-- `[ ]` Phase 4: UI/UX & Realtime Integration
+- `[x]` Phase 4: UI/UX & Realtime Integration
   - `[x]` **Task 7**: Triển khai các component: `HomeComponent`, `AccountListComponent`, `AccountDetailComponent`.
   - `[x]` **Task 8**: Triển khai `CheckoutModalComponent` hiển thị thông tin chuyển khoản VietQR và lắng nghe sự thay đổi trạng thái đơn hàng theo thời gian thực (Supabase Realtime).
+- `[ ]` Phase 5: Admin Panel & Security (New)
+  - `[x]` **Task 9**: Thiết kế file SQL `supabase/migrations/20260608000000_admin_roles_and_policies.sql` cấu hình bảng `user_roles` (mặc định role `'customer'`), trigger `on_auth_user_created` và RLS policies để chạy thủ công trên Supabase Cloud.
+  - `[x]` **Task 9.5**: Thiết lập Edge Function `cloudinary-upload` nhận file ảnh từ frontend, ký số bằng `CLOUDINARY_API_SECRET` và upload lên Cloudinary, trả về secure URL. Cấu hình các secrets trên Supabase CLI.
+  - `[x]` **Task 10**: Cập nhật `AuthService` để lấy quyền người dùng (`role`) và lưu dưới dạng Signals.
+  - [x] **Task 11**: Triển khai `AdminGuard` để chặn truy cập trái phép vào route `/admin`.
+  - `[ ]` **Task 12**: Triển khai `AdminComponent` gồm: dashboard thống kê (Doanh thu, tài khoản, đơn hàng), form quản lý game, form thêm tài khoản game (với credentials, tích hợp nút chọn file và tự động upload lên Cloudinary qua Edge Function), và quản lý xóa tài khoản.
+  - `[ ]` **Task 13**: Tích hợp liên kết "Quản Trị" trên header ứng dụng cho tài khoản admin và cấu hình route.
 - `[ ]` Phase X: Verification
   - `[ ]` Kiểm tra màu sắc (không dùng màu tím/violet).
   - `[ ]` Chạy script checklist.py.
   - `[ ]` Build dự án production.
--

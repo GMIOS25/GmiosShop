@@ -34,6 +34,7 @@ Thư mục chứa các thành phần dùng chung (dumb components, UI components
 Thư mục chứa các nghiệp vụ cụ thể (Smart components, pages).
 - `home/`
 - `auth/`
+- `admin/`
 
 #### [NEW] src/app/layouts/
 Thư mục chứa các cấu trúc trang.

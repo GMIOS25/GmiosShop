@@ -39,7 +39,7 @@
           <section class="gallery-wrapper">
             <div class="main-image-box">
               @if (account()!.images && account()!.images.length > 0) {
-                <img [src]="account()!.images[selectedImageIndex()]" [alt]="account()!.title" class="main-image" />
+                <img [src]="account()!.images[selectedImageIndex()]" alt="Account Image" [alt]="account()!.title" class="main-image" />
               } @else {
                 <div class="main-image-placeholder">🎮</div>
               }
@@ -202,3 +202,4 @@
   }
   
 </div>
+<!-- <title> name="description" og: label placeholder aria-label -->

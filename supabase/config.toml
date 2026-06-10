@@ -414,3 +414,11 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 
 [functions.sepay-webhook]
 verify_jwt = false
+
+[functions.cloudinary-upload]
+verify_jwt = false
+
+[functions.cloudinary-delete]
+verify_jwt = false
+
+

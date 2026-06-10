@@ -1,68 +1,79 @@
-<!-- Global Layout Wrapper -->
-<div class="app-layout">
-  
-  <!-- Sleek Monochrome Header -->
-  <header class="app-header">
-    <div class="header-container">
-      <a routerLink="/" class="logo-area">
-        <span class="logo-text">GMIOS SHOP</span>
-      </a>
+@if (!authService.isInitialized()) {
+  <div class="global-loader">
+    <div class="spinner"></div>
+    <div class="loader-text">Đang tải dữ liệu...</div>
+  </div>
+} @else {
+  <!-- Global Layout Wrapper -->
+  <div class="app-layout">
+    
+    <!-- Sleek Monochrome Header -->
+    <header class="app-header">
+      <div class="header-container">
+        <a routerLink="/" class="logo-area">
+          <span class="logo-text">GMIOS SHOP</span>
+        </a>
 
-      <nav class="nav-menu">
-        <a routerLink="/" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Cửa Hàng</a>
-        <!-- Future links placeholder -->
-        <span class="nav-link disabled-link">Nạp Thẻ <span class="nav-badge">Sắp có</span></span>
-      </nav>
+        <nav class="nav-menu">
+          <a routerLink="/" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Cửa Hàng</a>
+          @if (authService.isAdmin()) {
+            <a routerLink="/admin" class="nav-link" routerLinkActive="active">Quản Trị</a>
+          }
+          <!-- Future links placeholder -->
+          <span class="nav-link disabled-link">Nạp Thẻ <span class="nav-badge">Sắp có</span></span>
+        </nav>
 
-      <div class="auth-actions">
-        @if (authService.isAuthenticated()) {
-          <div class="user-info">
-            <span class="user-email" [title]="authService.currentUser()?.email">
-              {{ authService.currentUser()?.email }}
-            </span>
-            <button (click)="logout()" class="logout-btn" aria-label="Đăng xuất">
-              Đăng Xuất
-            </button>
-          </div>
-        } @else {
-          <div class="guest-actions">
-            <!-- Dedicated page route link -->
-            <a routerLink="/auth" class="auth-page-link">Đăng Nhập</a>
-            
-            <!-- Quick modal login button -->
-            <button (click)="authModalOpen.set(true)" class="auth-modal-btn">
-              Đăng Ký
-            </button>
-          </div>
-        }
+        <div class="auth-actions">
+          @if (authService.isAuthenticated()) {
+            <div class="user-info">
+              <span class="user-email" [title]="authService.currentUser()?.email">
+                {{ authService.currentUser()?.email }}
+              </span>
+              <button (click)="logout()" class="logout-btn" aria-label="Đăng xuất">
+                Đăng Xuất
+              </button>
+            </div>
+          } @else {
+            <div class="guest-actions">
+              <!-- Dedicated page route link -->
+              <a routerLink="/auth" class="auth-page-link">Đăng Nhập</a>
+              
+              <!-- Quick modal login button -->
+              <button (click)="authModalOpen.set(true)" class="auth-modal-btn">
+                Đăng Ký
+              </button>
+            </div>
+          }
+        </div>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <!-- Main Content Area -->
-  <main class="app-main">
-    <div class="main-container">
-      <router-outlet></router-outlet>
-    </div>
-  </main>
-
-  <!-- Footer -->
-  <footer class="app-footer">
-    <div class="footer-container">
-      <div class="footer-left">
-        <span class="footer-logo">GMIOS SHOP</span>
-        <span class="footer-copyright">© 2026 GmiosShop. All rights reserved.</span>
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <div class="main-container">
+        <router-outlet></router-outlet>
       </div>
-      <div class="footer-right">
-        <span class="footer-status-indicator">
-          <span class="status-dot"></span> Supabase Realtime Connected
-        </span>
-      </div>
-    </div>
-  </footer>
+    </main>
 
-  <!-- Auth Modal Overlay -->
-  @if (authModalOpen()) {
-    <app-auth mode="modal" (close)="authModalOpen.set(false)"></app-auth>
-  }
-</div>
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-container">
+        <div class="footer-left">
+          <span class="footer-logo">GMIOS SHOP</span>
+          <span class="footer-copyright">© 2026 GmiosShop. All rights reserved.</span>
+        </div>
+        <div class="footer-right">
+          <span class="footer-status-indicator">
+            <span class="status-dot"></span> Supabase Realtime Connected
+          </span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Auth Modal Overlay -->
+    @if (authModalOpen()) {
+      <app-auth mode="modal" (close)="authModalOpen.set(false)"></app-auth>
+    }
+  </div>
+}
+<!-- <title> name="description" og: label placeholder aria-label -->
