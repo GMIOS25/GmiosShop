@@ -11,7 +11,7 @@
   <header class="list-header">
     <div class="header-content">
       <h1 class="list-title">{{ activeGame()?.name || 'CỬA HÀNG TÀI KHOẢN' }}</h1>
-      <p class="list-subtitle">Khám phá kho siêu phẩm tài khoản game uy tín, an toàn bậc nhất Việt Nam.</p>
+      <p class="list-subtitle">Khám phá kho acc rác giá ngất ngưởng ngon nhất Việt Nam.</p>
     </div>
   </header>
 
@@ -27,7 +27,6 @@
           placeholder="Nhập tiêu đề, mô tả hoặc rank..." 
           class="form-control filter-input"
         />
-        <span class="search-icon">🔍</span>
       </div>
     </div>
 
@@ -38,16 +37,16 @@
           type="number" 
           [ngModel]="minPrice()" 
           (ngModelChange)="minPrice.set($event === '' || $event === null ? null : +$event)" 
-          placeholder="Giá từ" 
+          placeholder="Giá tối thiểu" 
           class="form-control price-input"
           min="0"
         />
-        <span class="price-separator">to</span>
+        <span class="price-separator">đến</span>
         <input 
           type="number" 
           [ngModel]="maxPrice()" 
           (ngModelChange)="maxPrice.set($event === '' || $event === null ? null : +$event)" 
-          placeholder="đến" 
+          placeholder="Giá tối đa" 
           class="form-control price-input"
           min="0"
         />

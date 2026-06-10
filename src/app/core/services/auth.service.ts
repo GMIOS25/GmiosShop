@@ -43,11 +43,17 @@ export class AuthService {
       this.#isInitialized.set(true);
     }
 
-    this.supabaseService.client.auth.onAuthStateChange(async (_event, session) => {
+    this.supabaseService.client.auth.onAuthStateChange((_event, session) => {
       const user = session?.user ?? null;
+      const previousUser = this.#currentUser();
       this.#currentUser.set(user);
+
       if (user) {
-        await this.fetchUserRole(user.id);
+        if (!previousUser || previousUser.id !== user.id || !this.#userRole()) {
+          setTimeout(() => {
+            this.fetchUserRole(user.id);
+          }, 0);
+        }
       } else {
         this.#userRole.set(null);
       }

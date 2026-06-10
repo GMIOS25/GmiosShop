@@ -105,14 +105,6 @@ $border-radius-premium: 12px;
     position: relative;
     display: flex;
     align-items: center;
-
-    .search-icon {
-      position: absolute;
-      right: 1rem;
-      font-size: 0.9rem;
-      color: $color-text-muted;
-      pointer-events: none;
-    }
   }
 
   .form-control {

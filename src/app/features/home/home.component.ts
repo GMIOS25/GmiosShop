@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
 import { AccountService } from '../../core/services/account.service';
 
 @Component({
@@ -11,7 +10,6 @@ import { AccountService } from '../../core/services/account.service';
   styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit {
-  readonly authService = inject(AuthService);
   readonly accountService = inject(AccountService);
 
   ngOnInit(): void {

@@ -78,15 +78,7 @@
             </div>
           </div>
 
-          <!-- Direct Database Info & Operational Notes -->
-          <div class="admin-info-box">
-            <h3>Nhật ký vận hành Admin</h3>
-            <ul>
-              <li>Hệ thống RLS đã được kích hoạt. Chỉ các tài khoản có phân quyền <span class="text-white">admin</span> trong bảng <span class="code">user_roles</span> mới có thể thực hiện thao tác ghi/xóa.</li>
-              <li>Toàn bộ thông tin đăng nhập của tài khoản (credentials) được mã hóa/cách ly ở bảng riêng biệt để tăng cường bảo mật.</li>
-              <li>Ảnh tải lên được lưu trữ trực tiếp trên Cloudinary thông qua Supabase Edge Functions.</li>
-            </ul>
-          </div>
+
         }
       </div>
     }
@@ -128,9 +120,11 @@
                         <span class="no-image">Không có ảnh</span>
                       }
                     </td>
-                    <td class="text-right actions-cell">
-                      <button (click)="openEditGameModal(game)" class="btn-action edit" title="Chỉnh sửa"></button>
-                      <button (click)="deleteGame(game.id)" class="btn-action delete" title="Xóa"></button>
+                    <td class="text-right">
+                      <div class="actions-cell">
+                        <button (click)="openEditGameModal(game)" class="btn-action edit" title="Chỉnh sửa"></button>
+                        <button (click)="deleteGame(game.id)" class="btn-action delete" title="Xóa"></button>
+                      </div>
                     </td>
                   </tr>
                 }
@@ -206,8 +200,10 @@
                           {{ acc.images.length || 0 }} ảnh
                         </span>
                       </td>
-                      <td class="text-right actions-cell">
-                        <button (click)="deleteAccount(acc)" class="btn-action delete" title="Xóa tài khoản và dọn dẹp ảnh"></button>
+                      <td class="text-right">
+                        <div class="actions-cell">
+                          <button (click)="deleteAccount(acc)" class="btn-action delete" title="Xóa tài khoản và dọn dẹp ảnh"></button>
+                        </div>
                       </td>
                     </tr>
                   }

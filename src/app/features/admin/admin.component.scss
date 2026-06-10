@@ -210,40 +210,6 @@ $color-accent-orange: #ff9f0a;
   }
 }
 
-.admin-info-box {
-  background-color: #121214;
-  border-left: 2px solid $color-text-primary;
-  border-top: 1px solid $color-border;
-  border-right: 1px solid $color-border;
-  border-bottom: 1px solid $color-border;
-  border-radius: 2px;
-  padding: 1.5rem 2rem;
-
-  h3 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    font-size: 1.05rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  ul {
-    margin: 0;
-    padding-left: 1.25rem;
-    color: $color-text-secondary;
-    font-size: 0.9rem;
-    line-height: 1.7;
-
-    li {
-      margin-bottom: 0.5rem;
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-}
-
 // Action Header & Controls
 .action-header {
   display: flex;
@@ -417,6 +383,7 @@ $color-accent-orange: #ff9f0a;
 .actions-cell {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 0.5rem;
 }
 

@@ -64,34 +64,13 @@ export class OrderService implements OnDestroy {
 
     this.#loading.set(true);
     try {
-      // Generate a unique payment code: e.g. GMS[timestamp][random_digit]
-      const randomDigit = Math.floor(Math.random() * 10);
-      const paymentCode = `GMS${Date.now()}${randomDigit}`;
-
-      const { data, error } = await this.supabaseService.client
-        .from('orders')
-        .insert({
-          user_id: user.id,
-          account_id: accountId,
-          amount,
-          payment_code: paymentCode,
-          buyer_email: buyerEmail,
-          payment_status: 'pending'
-        })
-        .select(`
-          *,
-          account:accounts(
-            id,
-            title,
-            price,
-            game:games(name, slug)
-          )
-        `)
-        .single();
+      const { data, error } = await this.supabaseService.client.functions.invoke('create-order', {
+        body: { accountId, buyerEmail }
+      });
 
       if (error) throw error;
 
-      const newOrder = data as any as Order;
+      const newOrder = data as Order;
       this.#activeOrder.set(newOrder);
       this.subscribeToOrderRealtime(newOrder.id);
       
@@ -100,7 +79,7 @@ export class OrderService implements OnDestroy {
 
       return newOrder;
     } catch (err) {
-      console.error('Error creating order:', err);
+      console.error('Error creating order through Edge Function:', err);
       return null;
     } finally {
       this.#loading.set(false);

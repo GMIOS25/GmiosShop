@@ -127,6 +127,8 @@ describe('GmiosShop Core Services', () => {
         const mockUser = { id: 'admin-uuid', email: 'admin@gmios.com' };
         if (authStateCallback) {
           await authStateCallback('SIGNED_IN', { user: mockUser });
+          // Wait for setTimeout to execute fetchUserRole
+          await new Promise(resolve => setTimeout(resolve, 0));
         }
 
         expect(service.currentUser()).toEqual(mockUser as any);
@@ -161,6 +163,8 @@ describe('GmiosShop Core Services', () => {
         const mockUser = { id: 'customer-uuid', email: 'customer@gmios.com' };
         if (authStateCallback) {
           await authStateCallback('SIGNED_IN', { user: mockUser });
+          // Wait for setTimeout to execute fetchUserRole
+          await new Promise(resolve => setTimeout(resolve, 0));
         }
 
         expect(service.currentUser()).toEqual(mockUser as any);

@@ -421,4 +421,17 @@ verify_jwt = false
 [functions.cloudinary-delete]
 verify_jwt = false
 
+[functions.admin-create-account]
+verify_jwt = false
 
+[functions.get-dashboard-stats]
+verify_jwt = false
+
+[functions.create-order]
+verify_jwt = false
+
+[functions.admin-create-slug]
+verify_jwt = false
+
+[functions.send-order-email]
+verify_jwt = false

@@ -1,25 +1,5 @@
 <div class="home-container">
   
-  <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="hero-content">
-      <h1 class="hero-title">ĐẲNG CẤP CHIẾN GAME</h1>
-      <p class="hero-lead">Sở hữu ngay tài khoản LMHT, FC Online, Liên Quân Mobile uy tín, bảo mật tuyệt đối với hệ thống giao dịch tự động Realtime.</p>
-      
-      @if (!authService.isAuthenticated()) {
-        <div class="hero-actions">
-          <a routerLink="/auth" class="btn-primary">Đăng Nhập Ngay</a>
-          <span class="action-caption">Đăng nhập để xem đầy đủ chi tiết và thực hiện mua tài khoản.</span>
-        </div>
-      } @else {
-        <div class="hero-actions">
-          <span class="btn-primary-disabled">Đã Đăng Nhập ✓</span>
-          <span class="action-caption">Chào mừng bạn trở lại! Sẵn sàng săn tài khoản xịn nào.</span>
-        </div>
-      }
-    </div>
-  </section>
-
   <!-- Categories Section -->
   <section class="categories-section">
     <h2 class="section-title">DANH MỤC TRÒ CHƠI</h2>

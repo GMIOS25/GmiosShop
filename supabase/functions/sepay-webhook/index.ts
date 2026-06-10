@@ -171,93 +171,27 @@ serve(async (req: Request) => {
 
     console.log(`Successfully updated database: Order ${matchedOrder.payment_code} set to "paid", Account ${matchedOrder.account_id} set to "sold"`)
 
-    // 8. Fetch sensitive game credentials to send to user
-    const { data: credentials, error: credsError } = await supabase
-      .from("account_credentials")
-      .select("username, password")
-      .eq("account_id", matchedOrder.account_id)
-      .single()
+    // 8. Trigger credentials email sending via internal Edge Function call
+    const sendEmailUrl = `${supabaseUrl}/functions/v1/send-order-email`
+    try {
+      console.log(`Triggering send-order-email for Order ID: ${matchedOrder.id}...`)
+      const emailResponse = await fetch(sendEmailUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${supabaseServiceKey}`,
+        },
+        body: JSON.stringify({ orderId: matchedOrder.id }),
+      })
 
-    if (credsError || !credentials) {
-      console.error(`Failed to fetch credentials for account ${matchedOrder.account_id}:`, credsError)
-      // Note: We don't rollback the transaction since money was already processed, just log the failure.
-    }
-
-    // 9. Send confirmation email with credentials via Resend API
-    const resendApiKey = Deno.env.get("RESEND_API_KEY")
-    if (resendApiKey) {
-      try {
-        const emailHtml = `
-          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; color: #1e293b;">
-            <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px;">
-              <h1 style="color: #0f172a; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.025em;">GmiosShop</h1>
-              <p style="color: #64748b; margin: 5px 0 0 0; font-size: 14px;">Giao dịch thanh toán thành công</p>
-            </div>
-            
-            <p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px;">Xin chào,</p>
-            <p style="font-size: 15px; line-height: 1.6; margin-bottom: 20px;">Chúng tôi đã nhận được thanh toán đầy đủ cho đơn hàng của bạn. Dưới đây là thông tin chi tiết đơn hàng và tài khoản game đã mua:</p>
-            
-            <div style="background-color: #f8fafc; border-radius: 8px; padding: 20px; margin-bottom: 25px; border-left: 4px solid #10b981;">
-              <h2 style="color: #0f172a; font-size: 15px; margin-top: 0; margin-bottom: 12px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Thông tin giao dịch</h2>
-              <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                <tr>
-                  <td style="color: #64748b; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">Mã đơn hàng:</td>
-                  <td style="color: #0f172a; font-weight: 700; text-align: right; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">${matchedOrder.payment_code}</td>
-                </tr>
-                <tr>
-                  <td style="color: #64748b; padding: 6px 0;">Số tiền nhận được:</td>
-                  <td style="color: #10b981; font-weight: 700; text-align: right; padding: 6px 0; font-size: 16px;">${Number(transferAmount).toLocaleString('vi-VN')} đ</td>
-                </tr>
-              </table>
-            </div>
-            
-            <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px; margin-bottom: 25px; border: 1px dashed #cbd5e1; text-align: center;">
-              <h2 style="color: #0f172a; font-size: 16px; margin-top: 0; margin-bottom: 15px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Thông tin tài khoản Game</h2>
-              <div style="display: inline-block; text-align: left; background: #ffffff; padding: 15px 25px; border-radius: 6px; border: 1px solid #e2e8f0; min-width: 250px;">
-                <div style="margin-bottom: 10px;">
-                  <span style="color: #64748b; font-size: 13px; display: block; margin-bottom: 2px;">Tài khoản (Username):</span>
-                  <strong style="color: #0f172a; font-size: 16px; font-family: 'Courier New', Courier, monospace; letter-spacing: 0.05em;">${credentials?.username || "Liên hệ hỗ trợ"}</strong>
-                </div>
-                <div>
-                  <span style="color: #64748b; font-size: 13px; display: block; margin-bottom: 2px;">Mật khẩu (Password):</span>
-                  <strong style="color: #ef4444; font-size: 16px; font-family: 'Courier New', Courier, monospace; letter-spacing: 0.05em;">${credentials?.password || "Liên hệ hỗ trợ"}</strong>
-                </div>
-              </div>
-              <p style="color: #b91c1c; font-size: 12px; margin-top: 15px; margin-bottom: 0; font-weight: 600;">⚠️ Lưu ý quan trọng: Vui lòng đăng nhập và tiến hành thay đổi mật khẩu ngay lập tức để bảo mật tài khoản tuyệt đối.</p>
-            </div>
-            
-            <div style="color: #64748b; font-size: 13px; line-height: 1.6; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
-              <p style="margin: 0 0 8px 0;">Nếu gặp bất kỳ khó khăn hoặc sự cố nào khi nhận tài khoản, xin vui lòng phản hồi email này hoặc liên hệ hỗ trợ trực tuyến trên website của chúng tôi.</p>
-              <p style="margin: 0; font-weight: 600; color: #475569;">© 2026 GmiosShop. All rights reserved.</p>
-            </div>
-          </div>
-        `
-
-        const emailResponse = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${resendApiKey}`,
-          },
-          body: JSON.stringify({
-            from: "GmiosShop <onboarding@resend.dev>",
-            to: [matchedOrder.buyer_email],
-            subject: `[GmiosShop] Thông tin tài khoản đơn hàng ${matchedOrder.payment_code}`,
-            html: emailHtml,
-          }),
-        })
-
-        if (!emailResponse.ok) {
-          const errorText = await emailResponse.text()
-          console.error("Resend API response error:", errorText)
-        } else {
-          console.log(`Successfully sent account credentials email to ${matchedOrder.buyer_email}`)
-        }
-      } catch (emailErr) {
-        console.error("Unexpected error while sending email via Resend:", emailErr)
+      if (!emailResponse.ok) {
+        const errorText = await emailResponse.text()
+        console.error(`Failed to trigger send-order-email: Status ${emailResponse.status} - ${errorText}`)
+      } else {
+        console.log(`Successfully triggered send-order-email for Order ID: ${matchedOrder.id}`)
       }
-    } else {
-      console.warn("RESEND_API_KEY environment variable is not configured. Email skipped.")
+    } catch (triggerErr) {
+      console.error("Unexpected error triggering send-order-email:", triggerErr)
     }
 
     return new Response(JSON.stringify({ success: true, message: "Transaction processed successfully" }), {

@@ -26,34 +26,9 @@ export class AdminService {
     }
 
     try {
-      const [gamesCountRes, accountsCountRes, ordersRes] = await Promise.all([
-        this.supabaseService.client.from('games').select('id', { count: 'exact', head: true }),
-        this.supabaseService.client.from('accounts').select('status'),
-        this.supabaseService.client.from('orders').select('amount, payment_status')
-      ]);
-
-      if (gamesCountRes.error) throw gamesCountRes.error;
-      if (accountsCountRes.error) throw accountsCountRes.error;
-      if (ordersRes.error) throw ordersRes.error;
-
-      const totalGames = gamesCountRes.count || 0;
-      const accounts = accountsCountRes.data || [];
-      const orders = ordersRes.data || [];
-
-      const stats = {
-        totalGames,
-        totalAccounts: accounts.length,
-        availableAccounts: accounts.filter(a => a.status === 'available').length,
-        soldAccounts: accounts.filter(a => a.status === 'sold').length,
-        pendingAccounts: accounts.filter(a => a.status === 'pending').length,
-        totalOrders: orders.length,
-        paidOrders: orders.filter(o => o.payment_status === 'paid').length,
-        pendingOrders: orders.filter(o => o.payment_status === 'pending').length,
-        expiredOrders: orders.filter(o => o.payment_status === 'expired').length,
-        totalRevenue: orders.filter(o => o.payment_status === 'paid').reduce((sum, o) => sum + Number(o.amount), 0)
-      };
-
-      return stats;
+      const { data, error } = await this.supabaseService.client.functions.invoke('get-dashboard-stats');
+      if (error) throw error;
+      return data;
     } catch (err) {
       console.error('Failed to load dashboard statistics:', err);
       throw err;
@@ -62,14 +37,16 @@ export class AdminService {
 
   // --- Games CRUD ---
   async createGame(name: string, slug: string, imageUrl?: string): Promise<Game> {
-    const { data, error } = await this.supabaseService.client
-      .from('games')
-      .insert({ name, slug, image_url: imageUrl })
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await this.supabaseService.client.functions.invoke('admin-create-slug', {
+        body: { name, slug, imageUrl }
+      });
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('Failed to create game through Edge Function:', err);
+      throw err;
+    }
   }
 
   async updateGame(id: string, name: string, slug: string, imageUrl?: string): Promise<Game> {
@@ -109,40 +86,14 @@ export class AdminService {
     accountData: { game_id: string; title: string; description?: string; price: number; images: string[] },
     credentialsData: { username: string; password: string }
   ): Promise<Account> {
-    // 1. Insert into accounts
-    const { data: account, error: accountError } = await this.supabaseService.client
-      .from('accounts')
-      .insert({
-        game_id: accountData.game_id,
-        title: accountData.title,
-        description: accountData.description,
-        price: accountData.price,
-        status: 'available',
-        images: accountData.images
-      })
-      .select()
-      .single();
-
-    if (accountError) throw accountError;
-
-    // 2. Insert credentials
     try {
-      const { error: credsError } = await this.supabaseService.client
-        .from('account_credentials')
-        .insert({
-          account_id: account.id,
-          username: credentialsData.username,
-          password: credentialsData.password
-        });
-
-      if (credsError) throw credsError;
-      return account;
+      const { data, error } = await this.supabaseService.client.functions.invoke('admin-create-account', {
+        body: { accountData, credentialsData }
+      });
+      if (error) throw error;
+      return data;
     } catch (err) {
-      // Rollback: delete account if credentials insert fails
-      await this.supabaseService.client
-        .from('accounts')
-        .delete()
-        .eq('id', account.id);
+      console.error('Failed to create account through Edge Function:', err);
       throw err;
     }
   }
