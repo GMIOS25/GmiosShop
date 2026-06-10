@@ -56,5 +56,5 @@ src/environments/environment.production.ts
 supabase/functions/.env
 supabase/functions/.env.local
 
-#doc
+#documents
 docs/*
