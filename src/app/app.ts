@@ -22,5 +22,7 @@ export class App {
       console.error('Error signing out:', err);
     }
   }
+
+  readonly contactFacebook = "https://www.facebook.com/Thanh.Cuong.IT";
 }
 

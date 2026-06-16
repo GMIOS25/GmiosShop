@@ -239,6 +239,28 @@ $color-success: #30d158;
     letter-spacing: 0.05em;
     color: $color-text-primary;
   }
+
+  .contact {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .contact-label {
+      color: $color-text-secondary;
+    }
+
+    .contact-link {
+      color: $color-text-primary;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s, text-decoration 0.2s;
+
+      &:hover {
+        color: rgba($color-text-primary, 0.8);
+        text-decoration: underline;
+      }
+    }
+  }
 }
 
 .footer-right {
@@ -288,6 +310,26 @@ $color-success: #30d158;
 
   .user-info .user-email {
     max-width: 110px;
+  }
+
+  .footer-container {
+    flex-direction: column;
+    gap: 1.25rem;
+    text-align: center;
+  }
+
+  .footer-left {
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .contact {
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .contact-separator {
+        display: none;
+      }
+    }
   }
 }
 
