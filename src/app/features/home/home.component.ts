@@ -21,6 +21,9 @@ export class HomeComponent implements OnInit {
       case 'lol': return '/assets/icons/lol.png';
       case 'fco': return '/assets/icons/fco.png';
       case 'lqm': return '/assets/icons/lqm.png';
+      case 'rb': return '/assets/icons/rb.png';
+      case 'pubg': return '/assets/icons/pubg.png';
+      case 'ff': return '/assets/icons/ff.png';
       default: return '🎮';
     }
   }

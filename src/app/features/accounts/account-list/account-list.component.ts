@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal, untracked } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AccountService } from '../../../core/services/account.service';
 import { CommonModule } from '@angular/common';
@@ -28,6 +28,63 @@ export class AccountListComponent implements OnInit {
   readonly minPrice = signal<number | null>(null);
   readonly maxPrice = signal<number | null>(null);
   readonly sortBy = signal<'newest' | 'price_asc' | 'price_desc'>('newest');
+
+  // Pagination signals
+  readonly currentPage = signal<number>(1);
+  readonly pageSize = signal<number>(3);
+
+  readonly totalPages = computed(() => {
+    return Math.ceil(this.filteredAccounts().length / this.pageSize());
+  });
+
+  readonly pages = computed(() => {
+    const current = this.currentPage();
+    const total = this.totalPages();
+    
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+    
+    const pagesList: number[] = [];
+    pagesList.push(1);
+    
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
+    
+    if (start > 2) {
+      pagesList.push(-1);
+    }
+    
+    for (let i = start; i <= end; i++) {
+      pagesList.push(i);
+    }
+    
+    if (end < total - 1) {
+      pagesList.push(-1);
+    }
+    
+    pagesList.push(total);
+    return pagesList;
+  });
+
+  readonly paginatedAccounts = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize();
+    const end = start + this.pageSize();
+    return this.filteredAccounts().slice(start, end);
+  });
+
+  constructor() {
+    // Keep currentPage in bounds when filters/accounts change
+    effect(() => {
+      const total = this.filteredAccounts().length;
+      const pageSize = this.pageSize();
+      const maxPage = Math.ceil(total / pageSize) || 1;
+      
+      if (this.currentPage() > maxPage) {
+        untracked(() => this.currentPage.set(maxPage));
+      }
+    });
+  }
 
   // Filtered Accounts
   readonly filteredAccounts = computed(() => {
@@ -75,6 +132,7 @@ export class AccountListComponent implements OnInit {
       this.activeGameSlug.set(slug);
       
       this.resetFilters();
+      this.currentPage.set(1);
 
       // Ensure games are loaded first
       if (this.accountService.games().length === 0) {
@@ -96,5 +154,16 @@ export class AccountListComponent implements OnInit {
     this.minPrice.set(null);
     this.maxPrice.set(null);
     this.sortBy.set('newest');
+    this.currentPage.set(1);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+      const grid = document.querySelector('.grid-section');
+      if (grid) {
+        grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
   }
 }

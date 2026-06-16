@@ -85,8 +85,8 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  private async handleAutoExpire(): Promise<void> {
-    await this.orderService.expireOrder(this.order.id);
+  private handleAutoExpire(): void {
+    this.orderService.clearActiveOrder();
     this.close.emit();
   }
 

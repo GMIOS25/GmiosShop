@@ -419,11 +419,6 @@ $border-radius-premium: 12px;
   max-width: 500px;
   margin: 3rem auto;
 
-  .empty-icon {
-    font-size: 3.5rem;
-    margin-bottom: 1.5rem;
-  }
-
   .empty-title {
     font-size: 1.4rem;
     font-weight: 800;
@@ -508,3 +503,71 @@ $border-radius-premium: 12px;
     background-position: -200% 0;
   }
 }
+
+/* Stark Modern Pagination */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid $color-border;
+
+  .pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pagination-btn {
+    background-color: transparent;
+    border: 1px solid $color-border;
+    color: $color-text-secondary;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+    outline: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    box-sizing: border-box;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: $color-border-hover;
+      color: $color-text-primary;
+      transform: translateY(-2px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+      border-color: $color-border;
+    }
+
+    &.active {
+      background-color: $color-action-bg;
+      color: $color-action-text;
+      border-color: $color-action-bg;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  .pagination-ellipsis {
+    color: $color-text-muted;
+    font-weight: 700;
+    padding: 0 0.25rem;
+    user-select: none;
+  }
+}
+

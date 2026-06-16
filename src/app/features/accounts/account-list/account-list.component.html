@@ -23,7 +23,7 @@
         <input 
           type="text" 
           [ngModel]="searchQuery()" 
-          (ngModelChange)="searchQuery.set($event)" 
+          (ngModelChange)="searchQuery.set($event); currentPage.set(1)" 
           placeholder="Nhập tiêu đề, mô tả hoặc rank..." 
           class="form-control filter-input"
         />
@@ -36,7 +36,7 @@
         <input 
           type="number" 
           [ngModel]="minPrice()" 
-          (ngModelChange)="minPrice.set($event === '' || $event === null ? null : +$event)" 
+          (ngModelChange)="minPrice.set($event === '' || $event === null ? null : +$event); currentPage.set(1)" 
           placeholder="Giá tối thiểu" 
           class="form-control price-input"
           min="0"
@@ -45,7 +45,7 @@
         <input 
           type="number" 
           [ngModel]="maxPrice()" 
-          (ngModelChange)="maxPrice.set($event === '' || $event === null ? null : +$event)" 
+          (ngModelChange)="maxPrice.set($event === '' || $event === null ? null : +$event); currentPage.set(1)" 
           placeholder="Giá tối đa" 
           class="form-control price-input"
           min="0"
@@ -57,7 +57,7 @@
       <label class="filter-label">Sắp xếp</label>
       <select 
         [ngModel]="sortBy()" 
-        (ngModelChange)="sortBy.set($event)" 
+        (ngModelChange)="sortBy.set($event); currentPage.set(1)" 
         class="form-control select-input"
       >
         <option value="newest">Mới nhất</option>
@@ -92,14 +92,13 @@
     } @else {
       @if (filteredAccounts().length === 0) {
         <div class="empty-state">
-          <div class="empty-icon">📂</div>
           <h3 class="empty-title">Không tìm thấy tài khoản</h3>
           <p class="empty-description">Rất tiếc, không tìm thấy tài khoản nào khớp với bộ lọc hiện tại của bạn. Vui lòng thử lại với cấu hình khác.</p>
           <button (click)="resetFilters()" class="btn-reset-empty">Xem tất cả</button>
         </div>
       } @else {
         <div class="accounts-grid">
-          @for (account of filteredAccounts(); track account.id) {
+          @for (account of paginatedAccounts(); track account.id) {
             <div class="account-card" [class.sold]="account.status === 'sold'" [class.pending]="account.status === 'pending'">
               <!-- Thumbnail -->
               <div class="card-media">
@@ -148,6 +147,46 @@
       }
     }
   </main>
+
+  <!-- Pagination -->
+  @if (totalPages() > 1 && !accountService.loading()) {
+    <nav class="pagination-container" aria-label="Phân trang">
+      <button 
+        class="pagination-btn btn-prev" 
+        [disabled]="currentPage() === 1" 
+        (click)="goToPage(currentPage() - 1)"
+        aria-label="Trang trước"
+      >
+        ← Trước
+      </button>
+      
+      <div class="pagination-pages">
+        @for (page of pages(); track page) {
+          @if (page === -1) {
+            <span class="pagination-ellipsis" aria-hidden="true">...</span>
+          } @else {
+            <button 
+              class="pagination-btn btn-page" 
+              [class.active]="currentPage() === page" 
+              (click)="goToPage(page)"
+              [attr.aria-current]="currentPage() === page ? 'page' : null"
+            >
+              {{ page }}
+            </button>
+          }
+        }
+      </div>
+      
+      <button 
+        class="pagination-btn btn-next" 
+        [disabled]="currentPage() === totalPages()" 
+        (click)="goToPage(currentPage() + 1)"
+        aria-label="Trang sau"
+      >
+        Sau →
+      </button>
+    </nav>
+  }
   
 </div>
 <!-- <title> name="description" og: label placeholder aria-label -->

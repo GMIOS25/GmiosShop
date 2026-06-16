@@ -79,9 +79,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
                 await this.orderService.loadOrderDetails(pendingOrder.id);
                 this.orderService.subscribeToOrderRealtime(pendingOrder.id);
                 this.showCheckout.set(true);
-              } else {
-                // Pending order has expired (> 5 min), automatically mark it as expired
-                await this.orderService.expireOrder(pendingOrder.id);
               }
             }
           }
